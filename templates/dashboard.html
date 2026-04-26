@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Security Advisor | Command Center</title>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- UI Libraries for Charts and PDFs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar / Navigation -->
+        <aside class="sidebar">
+            <div class="logo-box">
+                <div class="glow-orb"></div>
+                <h1>SecOps<strong>AI</strong></h1>
+            </div>
+            <nav>
+                <ul>
+                    <li class="nav-item active" data-target="view-scanner">Scanner Dashboard</li>
+                    <li class="nav-item" data-target="view-intelligence">Threat Intelligence</li>
+                    <li class="nav-item" data-target="view-reports">Historical Reports</li>
+                    <li class="nav-item" data-target="view-settings">Settings</li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Scanner View -->
+            <div id="view-scanner" class="view-section active">
+                <header>
+                    <h2>Vulnerability & Threat Analysis Engine</h2>
+                    <p>Simulates attack vectors to validate web application resilience.</p>
+                </header>
+
+            <section class="input-panel glass-panel">
+                <form id="scan-form">
+                    <div class="input-group">
+                        <input type="text" id="target-url" placeholder="https://target-application.com" required>
+                        <button type="submit" id="scan-btn">Initiate Neural Scan</button>
+                    </div>
+                </form>
+                <div id="loader" class="loader hidden">
+                    <div class="spinner"></div>
+                    <span id="loader-text">Initializing AI Models...</span>
+                </div>
+                <div id="error-message" class="error-message hidden"></div>
+            </section>
+
+            <!-- Results Section (Hidden initially) -->
+            <section id="results-panel" class="results-panel hidden">
+                <div class="top-cards">
+                    <div class="card glass-panel" id="risk-score-card">
+                        <h3>Overall Risk Score</h3>
+                        <div class="score-ring">
+                            <span id="risk-score-value">0</span><span class="max">/100</span>
+                        </div>
+                    </div>
+                    <div class="card glass-panel" id="risk-level-card">
+                        <h3>Threat Condition</h3>
+                        <div class="level-indicator" id="threat-level-value">UNKNOWN</div>
+                    </div>
+                </div>
+
+                <div class="bottom-split">
+                    <!-- Feature 2: Interactive Analytics (Traffic Pie Chart) -->
+                    <div class="card glass-panel" style="flex: 0.6; display: flex; flex-direction: column; align-items: center;">
+                        <h3 style="width: 100%; text-align: left;">Traffic Analytics</h3>
+                        <div style="position: relative; height:200px; width:200px; margin-top: 1rem;">
+                            <canvas id="trafficChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card glass-panel flex-grow">
+                        <h3>Security Advisories</h3>
+                        <ul id="recommendations-list" class="advisory-list">
+                            <!-- Populated dynamically -->
+                        </ul>
+                    </div>
+                    <div class="card glass-panel logs-card">
+                        <h3>Simulation Traffic Logs</h3>
+                        <div class="terminal-box" id="logs-terminal">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+            </div>
+
+            <!-- Threat Intelligence View -->
+            <div id="view-intelligence" class="view-section hidden">
+                <header>
+                    <h2>Global Threat Intelligence Feed</h2>
+                    <p>Live stream of currently tracked CVEs and heuristic signatures.</p>
+                </header>
+                <div class="glass-panel">
+                    <table class="report-table" id="intel-table">
+                        <thead>
+                            <tr>
+                                <th>Signature ID</th>
+                                <th>Threat Description</th>
+                                <th>Severity</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Historical Reports View -->
+            <div id="view-reports" class="view-section hidden">
+                <header style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h2>Historical Security Scans</h2>
+                        <p>Archive of all previously analyzed target applications.</p>
+                    </div>
+                    <!-- Feature 1: Export PDF Report -->
+                    <button id="export-pdf-btn" style="background: var(--accent); color: black; padding: 0.8rem 1.2rem; border-radius: 6px; font-weight: bold; cursor: pointer; border: none; box-shadow: 0 0 10px rgba(0,255,204,0.3);">📄 Export Executive PDF</button>
+                </header>
+                
+                <!-- Feature 2: Line Trend Chart -->
+                <div class="glass-panel" style="margin-bottom: 2rem;">
+                    <h3>Historical Risk Trend</h3>
+                    <div style="position: relative; height: 250px; width: 100%;">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="glass-panel" id="pdf-content-wrapper">
+                    <table class="report-table" id="reports-table">
+                        <thead>
+                            <tr>
+                                <th>Target URL</th>
+                                <th>Scan Time</th>
+                                <th>Risk Score</th>
+                                <th>Risk Level</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Settings View -->
+            <div id="view-settings" class="view-section hidden">
+                <header>
+                    <h2>Engine Configuration</h2>
+                    <p>System parameters for the Threat Detection framework.</p>
+                </header>
+                <div class="glass-panel config-panel">
+                    <h3>Simulation Parameters</h3>
+                    <div class="input-group config-group">
+                        <label>Max Asynchronous Networking Threads</label>
+                        <input type="number" value="25" disabled>
+                    </div>
+                    <div class="input-group config-group">
+                        <label>AI Heuristic Strictness</label>
+                        <select disabled>
+                            <option>High (Zero Trust)</option>
+                            <option>Medium</option>
+                            <option>Low</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
